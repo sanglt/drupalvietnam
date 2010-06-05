@@ -9,6 +9,5 @@ Các thông tin được thảo luận trên Google Wave. Liên hệ với **Th�
 #### Cấu trúc:
 - contrib/modules: Chứa các modules phát triển
 - contrib/themes: Chứa các theme phát triển
-
 - custom/theme/drupalvietnam: Theme drupalvietnam dựa trên Blue Cheese do Lê Thanh Sang phát triển
 - custom/modules: Các module do cộng đồng Drupal Việt Nam tự phát triển
