@@ -5,11 +5,27 @@ body {font-family:Verdana,Arial,"sans-serif";}
 a, a:link, a:visited, a:active { color: #0089DC; text-decoration: none;}
 a:hover, a:focus {color: #0089DC; text-decoration: underline;}
 
+/** Images **/
+#site-name a {background-image: url("../images/sprites.png"); background-repeat: no-repeat;}
+#search-block-form .form-text {background-image: url("../images/large-icons.png"); background-repeat: no-repeat;}
+
 /** Header **/
 body.front #header {height: 288px;}
 #header {background: url("../images/sprites-horizontal.png") repeat-x;}
 #header #site-name span {color: #fff;}
-
+#header #navigation ul {background: #064771; float: right; height: 25px; padding: 0 5px;}
+#header #navigation ul li {float: left; margin: 4px 8px;}
+#header #navigation ul li a {color: #FFFFFF;}
+#header #site-name {text-indent: -9999em;}
+.front #header #site-name {margin: 1em 0 0.5em;}
+.not-front #header #site-name {margin: 0;}
+#header #site-name a {background-position: 0 -480px; display: block; height: 57px;}
+#header #header-left h2 {color: #FFFFFF; font-weight: lighter;}
+/** Header - Search Form **/
+#block-search-form h2 {color: #FFFFFF; font-size: 1.5em; font-weight: lighter; line-height: 1em; margin-bottom: 1em;}
+#block-search-form .form-text {background-color: #FFFFFF; background-position: 4px -856px; border: 3px solid #1885C8; color: #222222; float: left; height: 14px; margin: 0 5px 0 0; padding: 10px 10px 10px 30px; width: 229px;}
+#block-search-form .form-text:focus {outline: 2px solid #E4E4E4;}
+#block-search-form .form-submit {background: url("../images/btn-search.png") no-repeat; border: none; cursor: pointer; display: block; height: 36px; margin: 0; padding: 0; text-indent: -9999em; width: 99px;}
 /** Footer **/
 #footer {background-color: #F6F6F2; padding: 30px 0 20px}
 #footer .block-system .content {border-top: 1px solid #E2E2DF; color: #666666; margin-top: 3em; padding-top: 1.5em; text-align: center;}
