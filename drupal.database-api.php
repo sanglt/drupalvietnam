@@ -1,0 +1,36 @@
+<?php
+// $Id: drupal.database-api.php 1 2010-12-28 04:38:52Z drupalvietnam $
+
+/**
+ * @defgroup drupal_database_usage Sử dụng Database API.
+ * @{
+ * Từ Drupal 7
+ *
+ * Thí dụ db_insert():
+ * @code
+ *  // INSERT INTO {dbtng_example} (name, surname) VALUES('John, 'Doe')
+ *  db_insert('dbtng_example')
+ *    ->fields(array('name' => 'John', 'surname' => 'Doe'))
+ *    ->execute();
+ * @endcode
+ *
+ * Thí dụ db_update():
+ * @code
+ *  // UPDATE {dbtng_example} SET name = 'Jane' WHERE name = 'John'
+ *  db_update('dbtng_example')
+ *    ->fields(array('name' => 'Jane'))
+ *    ->condition('name', 'John')
+ *    ->execute();
+ * @endcode
+ *
+ * Thí dụ db_delete():
+ * @code
+ *  // DELETE FROM {dbtng_example} WHERE name = 'Jane'
+ *  db_delete('dbtng_example')
+ *    ->condition('name', 'Jane')
+ *    ->execute();
+ * @endcode
+ */
+/**
+ * @} End of "defgroup drupal_database_usage"
+ */
