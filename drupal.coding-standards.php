@@ -46,7 +46,7 @@
  *        
  *          $conf['cache_inc'] = '/path/to/cache.memcache.inc';
  *        
- *        Cho nên, đối với thư mục này của Drupal, bạn không nên chỉnh sửa gì.
+ *        Cho nên, đối với thư mục này của Drupal, chúng ta không nên chỉnh sửa gì.
  *    - (02) misc
  *        Là thư mục chứa những hình ảnh, css và thư viện javascript được sử
  *        dụng trong hệ thống.
