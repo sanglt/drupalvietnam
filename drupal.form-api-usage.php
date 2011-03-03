@@ -102,6 +102,7 @@
  * @TODO: 4. Mở rộng, tuỳ biến các form hiện có.
  * @TODO: 5. Thí dụ tạo form cho phép upload hỉnh ảnh.
  * @TODO 6: Các form element mới xuất hiện ở Drupal 7
+ * @TODO7: Cách thêm css, javascript sử dụng thuộc tính '#attach'
  */
 /**
  * @} End of "defgroup drupal_form_api_usage"
