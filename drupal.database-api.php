@@ -42,7 +42,7 @@
  *   // Get uid, name of users who access Drupal last 10 minutes
  *   $query = db_select('users', 'u')->fields('u', array('uid', 'name'));
  *   $query->condition('u.access', time() - 10 * 60, '>=');
- *   $users = $query->execute()->fetAll();
+ *   $users = $query->execute()->fetchAll();
  *   print_r($users);
  * @endcode
  */
