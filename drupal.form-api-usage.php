@@ -93,6 +93,9 @@
  *  }
  * @endcode
  *
+ * Các bài viết Việt ngữ về Form API:
+ * - @link http://toila.net/node/3648 Sử dụng managed_file field @endlink 
+ *
  * @TODO: 1. Multistep form
  * @TODO: 2. Định nghĩa thêm form-field.
  * @TODO: 3. Tuỳ biến giao diện form.
