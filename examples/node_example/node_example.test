@@ -1,5 +1,4 @@
 <?php
-// $Id: node_example.test,v 1.2.2.2 2010/09/03 16:17:25 rfay Exp $
 
 /**
  * @file
@@ -31,18 +30,26 @@ class NodeExampleTestCase extends DrupalWebTestCase {
    */
   function testNodeCreation() {
     // Create and login user.
-    $account = $this->drupalCreateUser(array('access content', 'create example content'));
+    $account = $this->drupalCreateUser(array('access content', 'create node_example content'));
     $this->drupalLogin($account);
 
     // Create a new node. The image makes it more complicated, so skip it.
     $edit = array(
       'title' => $this->randomName(),
-      'color' => 'red',
-      'quantity' => 100,
+      'node_example_color[und][0][value]' => 'red',
+      'node_example_color[und][1][value]' => 'green',
+      'node_example_color[und][2][value]' => 'blue',
+      'node_example_quantity[und][0][value]' => 100,
     );
-    $this->drupalPost('node/add/example-node-type-1', $edit, t('Save'));
-    $this->assertText(t("Example node type 1 @title has been created", array('@title' => $edit['title'])));
-    $this->assertText(t('The order is for @number @color items', array('@number' => $edit['quantity'], '@color' => $edit['color'])));
+    $this->drupalPost('node/add/node-example', $edit, t('Save'));
+    $this->assertText("Example Node " . $edit['title'] . " has been created", "Found node creation message");
+    $this->assertPattern("/The colors available.*red.*green.*blue/", "Correct 'colors available' on node page");
+
+    // Look on the examples page to make sure it shows up there also.
+    $this->drupalGet('examples/node_example');
+    $this->assertText($edit['title'], "Found random title string");
+    $this->assertPattern("/red.*green.*blue/", "Correct 'colors available' on node example page");
+
   }
 }
 

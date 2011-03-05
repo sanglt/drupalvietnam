@@ -1,13 +1,14 @@
-; $Id: simpletest_example.info,v 1.1.2.4 2010/12/12 07:29:06 rfay Exp $
 
-name = SimpleTest example
-description = Demonstrates how to define SimpleTest tests.
-core = 6.x
+name = Simpletest Example
+description = Provides simpletest_example page node type.
+core = 7.x
 package = Example modules
+dependencies[] = simpletest
+files[] = simpletest_example.test
 
-; Information added by drupal.org packaging script on 2010-12-21
-version = "6.x-1.x-dev"
-core = "6.x"
+; Information added by drupal.org packaging script on 2011-03-04
+version = "7.x-1.x-dev"
+core = "7.x"
 project = "examples"
-datestamp = "1292890401"
+datestamp = "1299197111"
 

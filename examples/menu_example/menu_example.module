@@ -1,5 +1,4 @@
 <?php
-// $Id: menu_example.module,v 1.1.2.1 2010/05/28 03:17:37 rfay Exp $
 
 /**
  * @file
@@ -300,10 +299,15 @@ function _menu_example_menu_page($content = NULL, $arg1 = NULL, $arg2 = NULL) {
 }
 
 /**
- * Implements hook_perm() to provide a demonstration access string.
+ * Implements hook_permission() to provide a demonstration access string.
  */
-function menu_example_perm() {
-  return array('access protected menu example');
+function menu_example_permission() {
+  return array(
+    'access protected menu example' =>  array(
+      'title' => t('Access the protected menu example'),
+    ),
+  );
+
 }
 
 /**
@@ -369,16 +373,18 @@ function menu_example_id_load($id) {
  *   menu_router table.
  */
 function menu_example_menu_alter(&$items) {
-  // Change the path 'logout' to a Spanish 'salir''.
-  if (!empty($items['logout'])) {
-    $items['salir'] = $items['logout'];
-    unset($items['logout']);
+  // Change the path 'user/logout' to a Spanish 'user/salir'. This change will
+  // prevent the menu "Log out" link from showing up. You should go to user/salir
+  // manually to log out of the site.
+  if (!empty($items['user/logout'])) {
+    $items['user/salir'] = $items['user/logout'];
+    unset($items['user/logout']);
   }
 
   // Here we will change the title callback to our own function, changing the
   // 'user' link from the traditional to always being "username's account".
-  if (!empty($items['user/%user_uid_optional'])) {
-    $items['user/%user_uid_optional']['title callback'] = 'menu_example_user_page_title';
+  if (!empty($items['user/%user'])) {
+    $items['user/%user']['title callback'] = 'menu_example_user_page_title';
   }
 }
 
@@ -394,13 +400,13 @@ function _menu_example_simple_title_callback($base_string) {
   return $base_string . ' ' . $username;
 }
 /**
- * Title callback to rename the title dynamically.
+ * Title callback to rename the title dynamically, based on user_page_title().
  *
  * @param $account
  *   User account related to the visited page.
  */
 function menu_example_user_page_title($account) {
-  return t("@name's account", array('@name' => $account->name));
+  return is_object($account) ? t("@name's account", array('@name' => format_username($account))) : '';
 }
 
 /**

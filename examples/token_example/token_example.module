@@ -1,16 +1,4 @@
 <?php
-// $Id: token_example.module,v 1.8.2.2 2010/10/14 19:05:12 rfay Exp $
-
-/**
- * @file
- * The Token API module.
- *
- * The Token module provides an API for providing tokens to other modules.
- * Tokens are small bits of text that can be placed into larger documents
- * via simple placeholders, like %site-name or [user].
- *
- * @ingroup token
- */
 
 /**
  * Implements hook_menu().
@@ -27,42 +15,42 @@ function token_example_menu() {
 }
 
 /**
- * Implements hook_token_list().
+ * Implements hook_entity_info_alter().
+ *
+ * @todo Remove this when the testbot can properly pick up dependencies
+ * for contrib modules.
  */
-function token_example_token_list($type = 'all') {
-  module_load_include('tokens.inc', 'token_example');
-  return _token_example_token_list($type);
-}
-
-/**
- * Implements hook_token_values().
- */
-function token_example_token_values($type, $object = NULL) {
-  module_load_include('tokens.inc', 'token_example');
-  return _token_example_token_values($type, $object);
+function token_example_entity_info_alter(&$info) {
+  if (isset($info['taxonomy_term'])) {
+    $info['taxonomy_term']['token type'] = 'term';
+  }
+  if (isset($info['taxonomy_vocabulary'])) {
+    $info['taxonomy_vocabulary']['token type'] = 'vocabulary';
+  }
 }
 
 /**
  * Form builder; display lists of supported token entities and text to tokenize.
  */
-function token_example_example_form($form_state) {
-  $entities = token_entity_info();
+function token_example_example_form($form, &$form_state) {
+  $entities = entity_get_info();
   $token_types = array();
 
-  foreach ($entities as $entity_type => $info) {
-    $object_callback = "_token_example_get_{$entity_type}";
+  // Scan through the list of entities for supported token entities.
+  foreach ($entities as $entity => $info) {
+    $object_callback = "_token_example_get_{$entity}";
     if (function_exists($object_callback) && $objects = $object_callback()) {
-      $form[$entity_type] = array(
+      $form[$entity] = array(
         '#type' => 'select',
         '#title' => $info['label'],
         '#options' => array(0 => t('Not selected')) + $objects,
-        '#default_value' => isset($form_state['storage'][$entity_type]) ? $form_state['storage'][$entity_type] : 0,
+        '#default_value' => isset($form_state['storage'][$entity]) ? $form_state['storage'][$entity] : 0,
         '#access' => !empty($objects),
       );
 
       // Build a list of supported token types based on the available entites.
-      if ($form[$entity_type]['#access']) {
-        $token_types[] = $entity_type;
+      if ($form[$entity]['#access']) {
+        $token_types[$entity] = !empty($info['token type']) ? $info['token type'] : $entity;
       }
     }
   }
@@ -70,7 +58,7 @@ function token_example_example_form($form_state) {
   $form['text'] = array(
     '#type' => 'textarea',
     '#title' => t('Enter your text here'),
-    '#default_value' => 'Hello [user-name]!',
+    '#default_value' => 'Hello [current-user:name]!'
   );
 
   // Display the results of tokenized text.
@@ -78,10 +66,12 @@ function token_example_example_form($form_state) {
     $form['text']['#default_value'] = $form_state['storage']['text'];
 
     $data = array();
-    foreach (array_keys($entities) as $entity_type) {
-      if (!empty($form_state['storage'][$entity_type])) {
-        $object = token_entity_load($entity_type, $form_state['storage'][$entity_type]);
-        $data[$entity_type] = $object;
+    foreach ($entities as $entity => $info) {
+      if (!empty($form_state['storage'][$entity])) {
+        $objects = entity_load($entity, array($form_state['storage'][$entity]));
+        if ($objects) {
+          $data[$token_types[$entity]] = reset($objects);
+        }
       }
     }
 
@@ -89,14 +79,8 @@ function token_example_example_form($form_state) {
     $form['text_tokenized'] = array(
       '#type' => 'item',
       '#title' => t('Result'),
-      '#value' => token_replace_multiple($form_state['storage']['text'], $data),
+      '#markup' => token_replace($form_state['storage']['text'], $data),
     );
-
-    // If raw tokens were used, escape the output and add a warning.
-    if (strpos($form_state['storage']['text'], '-raw') !== FALSE) {
-      $form['text_tokenized']['#value'] = check_plain($form['text_tokenized']['#value']);
-      $form['text_tokenized']['#description'] = t('Note that dangerous token results will still be filtered.');
-    }
   }
 
   $form['submit'] = array(
@@ -104,9 +88,17 @@ function token_example_example_form($form_state) {
     '#value' => t('Submit'),
   );
 
-  $form['token_tree'] = array(
-    '#value' => theme('token_tree', $token_types),
-  );
+  if (module_exists('token')) {
+    $form['token_tree'] = array(
+      '#theme' => 'token_tree',
+      '#token_types' => $token_types,
+    );
+  }
+  else {
+    $form['token_tree'] = array(
+      '#markup' => '<p>' . t('Enable the <a href="@drupal-token">Token module</a> to view the available token browser.', array('@drupal-token' => 'http://drupal.org/project/token')) . '</p>',
+    );
+  }
 
   return $form;
 }
@@ -119,46 +111,21 @@ function token_example_example_form_submit($form, &$form_state) {
   $form_state['rebuild'] = TRUE;
 }
 
-function token_entity_info() {
-  $info['node'] = array(
-    'label' => t('Content'),
-  );
-  $info['comment'] = array(
-    'label' => t('Comment'),
-  );
-  $info['user'] = array(
-    'label' => t('User'),
-  );
-  return $info;
-}
-
-function token_entity_load($entity_type, $entity_id) {
-  switch ($entity_type) {
-    case 'node':
-      return node_load($entity_id);
-    case 'comment':
-      $sql = 'SELECT c.cid, c.pid, c.nid, c.subject, c.comment, c.format, c.timestamp, c.name, c.mail, c.homepage, u.uid, u.name AS registered_name, u.signature, u.signature_format, u.picture, u.data, c.status FROM {comments} c INNER JOIN {users} u ON c.uid = u.uid WHERE c.cid = %d';
-      return db_fetch_object(db_query($sql, $entity_id));
-    case 'user':
-      return user_load($entity_id);
-  }
-}
-
 /**
  * Build a list of available content.
  */
 function _token_example_get_node() {
-  if (!user_access('access content') && !user_access('administer nodes')) {
+  if (!user_access('access content') && !user_access('bypass node access')) {
     return array();
   }
 
-  $sql = "SELECT n.nid, n.title FROM {node} n WHERE n.status = %d ORDER BY n.created DESC";
-  $query = db_query_range(db_rewrite_sql($sql), 1, 0, 10);
-
-  $nodes = array();
-  while ($result = db_fetch_object($query)) {
-    $nodes[$result->nid] = $result->title;
-  }
+  $node_query = db_select('node', 'n');
+  $node_query->fields('n', array('nid', 'title'));
+  $node_query->condition('n.status', NODE_PUBLISHED);
+  $node_query->orderBy('n.created', 'DESC');
+  $node_query->range(0, 10);
+  $node_query->addTag('node_access');
+  $nodes = $node_query->execute()->fetchAllKeyed();
   $nodes = array_map('check_plain', $nodes);
   return $nodes;
 }
@@ -171,32 +138,58 @@ function _token_example_get_comment() {
     return array();
   }
 
-  $sql = 'SELECT c.cid, c.subject FROM {comments} c WHERE c.status = %d ORDER BY c.timestamp DESC';
-  $query = db_query_range(db_rewrite_sql($sql, 'c', 'cid'), COMMENT_PUBLISHED, 0, 10);
-
-  $comments = array();
-  while ($result = db_fetch_object($query)) {
-    $comments[$result->cid] = $result->subject;
-  }
+  $comment_query = db_select('comment', 'c');
+  $comment_query->innerJoin('node', 'n', 'n.nid = c.nid');
+  $comment_query->fields('c', array('cid', 'subject'));
+  $comment_query->condition('n.status', NODE_PUBLISHED);
+  $comment_query->condition('c.status', COMMENT_PUBLISHED);
+  $comment_query->orderBy('c.created', 'DESC');
+  $comment_query->range(0, 10);
+  $comment_query->addTag('node_access');
+  $comments = $comment_query->execute()->fetchAllKeyed();
   $comments = array_map('check_plain', $comments);
   return $comments;
 }
 
 /**
- * Build a list of availalbe user accounts.
+ * Build a list of available user accounts.
  */
 function _token_example_get_user() {
   if (!user_access('access user profiles') && !user_access('administer users')) {
     return array();
   }
 
-  $sql = 'SELECT u.uid, u.name FROM {users} u WHERE u.uid > 0 AND u.status = 1';
-  $query = db_query_range($sql, 0, 1);
-
-  $accounts = array();
-  while ($result = db_fetch_object($query)) {
-    $accounts[$result->uid] = $result->name;
-  }
+  $account_query = db_select('users', 'u');
+  $account_query->fields('u', array('uid', 'name'));
+  $account_query->condition('u.uid', 0, '>');
+  $account_query->condition('u.status', 1);
+  $account_query->range(0, 10);
+  $accounts = $account_query->execute()->fetchAllKeyed();
   $accounts = array_map('check_plain', $accounts);
   return $accounts;
+}
+
+/**
+ * Build a list of available taxonomy terms.
+ */
+function _token_example_get_taxonomy_term() {
+  $term_query = db_select('taxonomy_term_data', 'ttd');
+  $term_query->fields('ttd', array('tid', 'name'));
+  $term_query->range(0, 10);
+  $term_query->addTag('term_access');
+  $terms = $term_query->execute()->fetchAllKeyed();
+  $terms = array_map('check_plain', $terms);
+  return $terms;
+}
+
+/**
+ * Build a list of available files.
+ */
+function _token_example_get_file() {
+  $file_query = db_select('file_managed', 'f');
+  $file_query->fields('f', array('fid', 'filename'));
+  $file_query->range(0, 10);
+  $files = $file_query->execute()->fetchAllKeyed();
+  $files = array_map('check_plain', $files);
+  return $files;
 }

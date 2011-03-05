@@ -1,5 +1,4 @@
 <?php
-// $Id: page_example.test,v 1.1.2.3 2010/09/03 17:08:33 rfay Exp $
 
 /**
  * @file
@@ -78,26 +77,25 @@ class PageExampleTestCase extends DrupalWebTestCase {
     $this->web_user = $this->drupalCreateUser(array('access simple page'));
     $this->drupalLogin($this->web_user);
 
-    // Verify that user can access foo content
+    // Verify that user can access simple content
     $this->drupalGet('examples/page_example/simple');
-    $this->assertResponse(200, t('Simple page content successfully accessed.'));
-    $this->assertText(t('The quick brown fox jumps over the lazy dog.'), t('foo content successfully verified.'));
+    $this->assertResponse(200, t('simple content successfully accessed.'));
+    $this->assertText(t('The quick brown fox jumps over the lazy dog.'), t('Simple content successfully verified.'));
 
     // Check if user can't access arguments page
     $this->pageExampleVerifyNoAccess('examples/page_example/arguments/1/2');
-    
-    
 
-    // Create a user with permissions to access 'arguments' page and login.
+
+
+    // Create a user with permissions to access 'simple' page and login.
     $this->web_user = $this->drupalCreateUser(array('access arguments page'));
     $this->drupalLogin($this->web_user);
-    
-    // Verify that user can access foo content
+
+    // Verify that user can access simple content
     $first = $this->randomNumber(3);
     $second = $this->randomNumber(3);
     $this->drupalGet('examples/page_example/arguments/' . $first . '/' . $second);
     $this->assertResponse(200, t('arguments content successfully accessed.'));
-    
     // Verify argument usage
     $this->assertRaw(t("First number was @number.", array('@number' => $first)), t('arguments first argument successfully verified.'));
     $this->assertRaw(t("Second number was @number.", array('@number' => $second)), t('arguments second argument successfully verified.'));

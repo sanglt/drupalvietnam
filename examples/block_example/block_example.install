@@ -1,5 +1,4 @@
 <?php
-// $Id: block_example.install,v 1.1.2.2 2010/06/28 20:00:28 rfay Exp $
 
 /**
  * @file
@@ -7,9 +6,8 @@
  */
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function block_example_uninstall() {
-
   variable_del('block_example_string');
 }

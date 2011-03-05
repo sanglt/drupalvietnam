@@ -1,63 +1,60 @@
 <?php
-// $Id: nodeapi_example.install,v 1.1.2.2 2010/12/20 22:44:12 rfay Exp $
 
 /**
  * @file
- * Nodeapi example module's install and uninstall code.
+ * Install, update and uninstall functions for the nodeapi example module.
+ *
+ * This file contains the functions required to perform install, update and
+ * uninstall operations.
+ *
  */
 
 /**
- * Implementation of hook_install().
+ * Implements hook_install().
  */
 function nodeapi_example_install() {
-  drupal_install_schema('nodeapi_example');
 }
 
 /**
- * Implementation of hook_uninstall().
+ * Implements hook_uninstall().
  */
 function nodeapi_example_uninstall() {
-  drupal_uninstall_schema('nodeapi_example');
 }
 
 /**
- * Implementation of hook_schema().
+ * Implements hook_schema().
  */
 function nodeapi_example_schema() {
   $schema['nodeapi_example'] = array(
-  'fields' => array(
-      'id' => array(
-      'type' => 'serial',
-      'not null' => TRUE,
-      'description' => t('Primary Key: Unique ID.'),
+    'description' => 'Stores information of extended content.',
+    'fields' => array(
+      'nid'    => array(
+        'description' => 'Node ID that the rating is applied to.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'vid'    => array(
+        'description' => 'Revision ID, as we are tracking rating with node revisions',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
+      'rating' => array(
+        'description' => 'The rating of the node.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0
+      ),
     ),
-    'nid' => array(
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => TRUE,
-      'default' => 0,
-      'description' => t('node id for the rating'),
+    'primary key' => array('vid'),
+    'indexes' => array(
+      'nid'   => array('nid'),
     ),
-    'vid' => array(
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => TRUE,
-      'default' => 0,
-      'description' => t('version id for rating'),
-    ),
-    'rating' => array(
-      'type' => 'int',
-      'unsigned' => TRUE,
-      'not null' => TRUE,
-      'default' => 0,
-      'description' => t('rating for this node'),
-    ),
-  ),
-  'primary key' => array('id'),
   );
-  return $schema;
-}
 
-function nodeapi_example_update_1() {
-  return _system_update_utf8(array('nodeapi_example'));
+  return $schema;
 }

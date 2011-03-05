@@ -1,13 +1,14 @@
-; $Id: node_example.info,v 1.1.2.3 2010/12/12 07:29:06 rfay Exp $
 
 name = Node example
-description = Demonstrates how to define content types.
-core = 6.x
+description = Demonstrates a custom content type and uses the field api.
 package = Example modules
+core = 7.x
+dependencies[] = image
+files[] = node_example.test
 
-; Information added by drupal.org packaging script on 2010-12-21
-version = "6.x-1.x-dev"
-core = "6.x"
+; Information added by drupal.org packaging script on 2011-03-04
+version = "7.x-1.x-dev"
+core = "7.x"
 project = "examples"
-datestamp = "1292890401"
+datestamp = "1299197111"
 

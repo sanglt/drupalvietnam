@@ -1,65 +1,129 @@
 <?php
 
 /**
- * Implementation of hook_token_list().
+ * @file
+ * Token callbacks for the token_example module.
  */
-function _token_example_token_list($type = 'all') {
-  $tokens = array();
 
-  if ($type == 'global' || $type == 'all') {
-    $tokens['global']['random-sha1']  = t("A randomly generated SHA1 hash.");
-    $tokens['global']['site-date-timestamp'] = t('The current timestamp in seconds past January 1, 1970.');
-    $tokens['global']['random-num-1'] = t('A randomly generated single-digit number.');
-    $tokens['global']['random-num-3'] = t('A randomly generated three-digit number.');
-    $tokens['global']['random-num-10'] = t('A randomly generated ten-digit number.');
-    $tokens['global']['random-alpha-1'] = t('Randomly generated single-digit letter.');
-    $tokens['global']['random-alpha-3'] = t('Randomly generated three-digit letters.');
-    $tokens['global']['random-alpha-10'] = t('Randomly generated ten-digit letters.');
-  }
-  if ($type == 'node' || $type == 'all') {
-    $tokens['node']['node-format'] = t('Input format used for the node body.');
-    $tokens['node'] += token_get_date_token_info(t('Node revision timestamp'), 'node-revision-');
-    // Node tokens here.
+/**
+ * Implements hook_token_info().
+ */
+function token_example_token_info() {
+  // Add two different token types. The first is the generic text format. The
+  // second is the user's default text format, which is itself a 'format' token
+  // type so it can be used directly.
+  $info['types']['format'] = array(
+    'name' => t('Text formats'),
+    'description' => t('Tokens related to text formats.'),
+    'needs-data' => 'format',
+  );
+  $info['types']['default-format'] = array(
+    'name' => t('Default text format'),
+    'description' => t("Tokens related to the currently logged in user's default text format."),
+    'type' => 'format',
+  );
+
+  // Tokens for the text format token type.
+  $info['tokens']['format']['id'] = array(
+    'name' => t('ID'),
+    'description' => t("The unique ID of the text format."),
+  );
+  $info['tokens']['format']['name'] = array(
+    'name' => t('Name'),
+    'description' => t("The name of the text format."),
+  );
+
+  // Node tokens.
+  $info['tokens']['node']['body-format'] = array(
+    'name' => t('Body text format'),
+    'description' => t("The name of the text format used on the node's body field."),
+    'type' => 'format',
+  );
+
+  // Comment tokens.
+  if (module_exists('comment')) {
+    $info['tokens']['comment']['body-format'] = array(
+      'name' => t('Body text format'),
+      'description' => t("The name of the text format used on the comment's body field."),
+      'type' => 'format',
+    );
   }
 
-  return $tokens;
+  return $info;
 }
 
 /**
- * Implementation of hook_token_values().
+ * Implements hook_tokens().
  */
-function _token_example_token_values($type, $object = NULL) {
-  $values = array();
+function token_example_tokens($type, $tokens, array $data = array(), array $options = array()) {
+  $replacements = array();
+  $sanitize = !empty($options['sanitize']);
 
-  if ($type == 'global') {
-    $values['random-sha1']  = sha1(rand());
-    // Create random numbers.
-    $values['random-num-1'] = mt_rand(0, 9);
-    $values['random-num-3'] = mt_rand(100, 999);
-    $values['random-num-10'] = mt_rand(10000, 99999) . mt_rand(10000, 99999);
-    // Create random letters.
-    $letters = range('a', 'z');
-    $values['random-alpha-1'] = $letters[array_rand($letters, 1)];
-    shuffle($letters);
-    $values['random-alpha-3'] = implode('', array_slice($letters, 0, 3));
-    shuffle($letters);
-    $values['random-alpha-10'] = implode('', array_slice($letters, 0, 10));
-    // Create a UNIX timestamp token.
-    $time = time();
-    $tz = variable_get('date_default_timezone', 0);
-    $values['site-date-timestamp'] = format_date($time, 'custom', 'Y', $tz);
-  }
-  elseif ($type == 'node' && !empty($object)) {
-    $format = $object->format || variable_get('filter_default_format', 1);
-    $format = filter_format_load($object->format);
-    if (!empty($format->name)) {
-      $values['node-format'] = check_plain($format->name);
+  // Text format tokens.
+  if ($type == 'format' && !empty($data['format'])) {
+    $format = $data['format'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'id':
+          // Since {filter_format}.format is an integer and not user-entered
+          // text, it does not need to ever be sanitized.
+          $replacements[$original] = $format->format;
+          break;
+        case 'name':
+          // Since the format name is user-entered text, santize when requested.
+          $replacements[$original] = $sanitize ? filter_xss($format->name) : $format->name;
+          break;
+      }
     }
-    if (isset($object->revision_timestamp)) {
-      $values += token_get_date_token_values($object->revision_timestamp, 'node-revision-');
-    }
-    // Node tokens go here.
   }
 
-  return $values;
+  // Default format tokens.
+  if ($type == 'default-format') {
+    $default_id = filter_default_format();
+    $default_format = filter_format_load($default_id);
+    $replacements += token_generate('format', $tokens, array('format' => $default_format), $options);
+  }
+
+  // Node tokens.
+  if ($type == 'node' && !empty($data['node'])) {
+    $node = $data['node'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'body-format':
+          $format = filter_format_load($node->body[LANGUAGE_NONE][0]['format']);
+          $replacements[$original] = $sanitize ? filter_xss($format->name) : $format->name;
+          break;
+      }
+    }
+
+    // Chained token relationships.
+    if ($format_tokens = token_find_with_prefix($tokens, 'body-format')) {
+      $body_format = filter_format_load($node->body[LANGUAGE_NONE][0]['format']);
+      $replacements += token_generate('format', $format_tokens, array('format' => $body_format), $options);
+    }
+  }
+
+  // Comment tokens.
+  if ($type == 'comment' && !empty($data['comment'])) {
+    $comment = $data['comment'];
+
+    foreach ($tokens as $name => $original) {
+      switch ($name) {
+        case 'body-format':
+          $format = filter_format_load($comment->comment_body[LANGUAGE_NONE][0]['format']);
+          $replacements[$original] = $sanitize ? filter_xss($format->name) : $format->name;
+          break;
+      }
+    }
+
+    // Chained token relationships.
+    if ($format_tokens = token_find_with_prefix($tokens, 'body-format')) {
+      $body_format = filter_format_load($comment->comment_body[LANGUAGE_NONE][0]['format']);
+      $replacements += token_generate('format', $format_tokens, array('format' => $body_format), $options);
+    }
+  }
+
+  return $replacements;
 }
