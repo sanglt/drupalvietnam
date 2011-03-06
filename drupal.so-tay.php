@@ -33,7 +33,7 @@
  *   - @link http://groups.drupal.org/node/5667 Tùy biến hộp đăng nhập @endlink
  *   - @link http://groups.drupal.org/node/5260 Thumnail ở bản cắt, ảnh lớn ảnh bản đầy đủ @endlink
  *   - @link http://groups.drupal.org/node/5777 Tạo Gallery không sử dụng module Image @endlink
- *   - @link http://cruncht.com/417/mobile-drupal-groundwork Loạt 4 bài về xây dựng phiên bản mobile cho website]
+ *   - @link http://cruncht.com/417/mobile-drupal-groundwork Loạt 4 bài về xây dựng phiên bản mobile cho website @endlink
  *   - @link http://www-128.ibm.com/developerworks/ibm/osource/implement.html Serie 15 bài viết của IBM về Drupal @endlink
  */
  
