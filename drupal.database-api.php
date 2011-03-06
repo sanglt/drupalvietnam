@@ -1,10 +1,19 @@
 <?php
-// $Id: drupal.database-api.php 1 2010-12-28 04:38:52Z drupalvietnam $
 
 /**
  * @defgroup drupal_database_usage Sử dụng Database API.
  * @{
- * Từ Drupal 7
+ * Chuyển từ Drupal 6 sang 7, có sự thay đổi lớn về cách làm việc
+ * với cơ sở dữ liệu -- mọi thao tác đến cơ sở dữ liệu trong Drupal,
+ * đều thông qua DBTNG (Database The Next Generation), được xây
+ * dựng trên nền @link http://php.net/manual/en/book.pdo.php PDO @endlink.
+ *
+ *  Việc sử dụng DBTNG giúp Drupal và các module thống nhất được
+ * cú pháp PHP để làm việc với các loại cơ sở dữ liệu khác nhau (MySQL,
+ * PostgreSQL, SQLite, ...)
+ *
+ * Sau đây là một số thí dụ sử dụng DBTNG. Có thể tham khảo thêm ở
+ * @link dbtng_example module @endlink
  *
  * Thí dụ db_insert():
  * @code
