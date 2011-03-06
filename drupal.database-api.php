@@ -8,12 +8,12 @@
  * đều thông qua DBTNG (Database The Next Generation), được xây
  * dựng trên nền @link http://php.net/manual/en/book.pdo.php PDO @endlink.
  *
- *  Việc sử dụng DBTNG giúp Drupal và các module thống nhất được
+ * Việc sử dụng DBTNG giúp Drupal và các module thống nhất được
  * cú pháp PHP để làm việc với các loại cơ sở dữ liệu khác nhau (MySQL,
  * PostgreSQL, SQLite, ...)
  *
  * Sau đây là một số thí dụ sử dụng DBTNG. Có thể tham khảo thêm ở
- * @link dbtng_example module @endlink
+ * @link http://drupalvietnam.org/api/search/documentation/dbtng_example dbtng_example module @endlink
  *
  * Thí dụ db_insert():
  * @code
