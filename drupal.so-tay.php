@@ -3,6 +3,7 @@
 /**
  * @file
  * Sổ tay Drupal
+ *
  * - Giới thiệu tổng quát
  *   - @link http://groups.drupal.org/node/1958 Drupal là gì ? @endlink
  *   - @link http://groups.drupal.org/node/4719 Các website Việt Nam sử dụng drupal @endlink
