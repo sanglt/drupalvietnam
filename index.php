@@ -14,8 +14,6 @@
  *  - @link examples.index.php Các module mẫu @endlink các tính
  *    năng được Drupal Core cung cấp.
  *  - Drupal và Javascript.
- *  - @link http://drupal.org/project/examples Các module mẫu @endlink
- *    - @link AHAH
  *
  * - Module mở rộng
  *  - @link http://drupal.org/project/ctools CTools @endlink
