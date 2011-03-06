@@ -13,7 +13,7 @@
  * PostgreSQL, SQLite, ...)
  *
  * Sau đây là một số thí dụ sử dụng DBTNG. Có thể tham khảo thêm ở
- * @link http://drupalvietnam.org/api/search/documentation/dbtng_example dbtng_example module @endlink
+ * @link dbtng_example.module dbtng_example module @endlink
  *
  * Thí dụ db_insert():
  * @code
