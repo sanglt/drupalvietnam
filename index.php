@@ -11,7 +11,7 @@
  *  - @link drupal_database_usage Sử dụng Database API @endlink
  *  - @link drupal_form_api_usage Sử dụng Form API @endlink
  *  - @link drupal_form_api_reference Tham khảo Form API @endlink
- *  - @link http://drupal.org/project/examples Các module mẫu @endlink các tính
+ *  - @link http://drupalvietnam.org/api/documentation/examples--examples.index.php/documentation Các module mẫu @endlink các tính
  *    năng được Drupal Core cung cấp.
  *  - Drupal và Javascript.
  *  - @link http://drupal.org/project/examples Các module mẫu @endlink
